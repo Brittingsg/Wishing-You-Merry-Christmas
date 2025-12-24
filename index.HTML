@@ -20,49 +20,46 @@
             font-family: 'Poppins', sans-serif;
             background: radial-gradient(circle, var(--red), var(--dark-red));
             color: white;
-            /* Allow scrolling so the ad can be seen at the bottom */
             overflow-x: hidden;
             overflow-y: auto;
         }
 
-        /* Wrapper to structure content and ads */
         .main-container {
             position: relative;
             z-index: 2;
             display: flex;
             flex-direction: column;
             align-items: center;
+            justify-content: center;
             min-height: 100vh;
             padding: 20px;
             box-sizing: border-box;
         }
 
-        /* --- Snowfall Background --- */
         #snow-canvas {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             pointer-events: none; z-index: 1;
         }
 
-        /* --- Input Screen (The Gift) --- */
+        /* --- Input Screen --- */
         #inputScreen {
-            margin-top: auto;
-            margin-bottom: auto;
             text-align: center;
-            background: rgba(0,0,0,0.6);
-            padding: 40px;
+            background: rgba(0,0,0,0.7);
+            padding: 40px 20px;
             border-radius: 20px;
             border: 3px solid var(--gold);
             backdrop-filter: blur(10px);
             box-shadow: 0 0 50px rgba(0,0,0,0.5);
             max-width: 400px;
             width: 90%;
+            display: block; /* Default visible */
         }
 
         .gift-icon {
             font-size: 80px;
             animation: bounce 2s infinite;
             display: block;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
 
         @keyframes bounce {
@@ -75,11 +72,12 @@
             padding: 15px;
             width: 80%;
             border-radius: 50px;
-            border: none;
+            border: 2px solid var(--gold);
             font-size: 1.1rem;
             text-align: center;
             margin-bottom: 20px;
             outline: none;
+            color: #333;
         }
 
         .open-btn {
@@ -93,17 +91,18 @@
             cursor: pointer;
             transition: 0.3s;
             box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            text-transform: uppercase;
         }
+
+        .open-btn:hover { transform: scale(1.05); background: #fff; }
 
         /* --- Message Screen --- */
         #wishScreen {
-            display: none;
+            display: none; /* Hidden by default */
             text-align: center;
             padding: 20px;
             max-width: 600px;
-            margin-top: auto;
-            margin-bottom: auto;
-            animation: zoomIn 1s ease-out;
+            animation: zoomIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         h1 {
@@ -116,8 +115,21 @@
 
         .blessing {
             font-family: 'Great Vibes', cursive;
-            font-size: 1.8rem;
+            font-size: 2.2rem;
             margin: 20px 0;
+            line-height: 1.2;
+        }
+
+        .from-msg {
+            font-size: 1.4rem;
+            letter-spacing: 2px;
+            background: var(--gold);
+            color: var(--dark-red);
+            padding: 5px 15px;
+            display: inline-block;
+            border-radius: 5px;
+            font-weight: bold;
+            margin-bottom: 10px;
         }
 
         .share-box {
@@ -139,18 +151,23 @@
             gap: 10px;
             font-weight: bold;
             margin: 5px;
+            transition: 0.3s;
         }
 
-        /* --- Adsterra Bottom Slot --- */
+        .create-own {
+            display: block;
+            margin-top: 15px;
+            color: var(--gold);
+            text-decoration: underline;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        /* --- Ads Slot --- */
         .ad-bottom-slot {
-            margin-top: 40px;
-            padding-bottom: 20px;
+            margin-top: 30px;
             text-align: center;
             width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
         }
 
         @keyframes zoomIn {
@@ -159,9 +176,9 @@
         }
 
         @media (max-width: 500px) {
-            h1 { font-size: 2.5rem; }
-            .blessing { font-size: 1.4rem; }
-            .ad-bottom-slot { overflow-x: auto; } /* Handle wider ad on tiny screens */
+            h1 { font-size: 2.8rem; }
+            .blessing { font-size: 1.8rem; }
+            input { width: 90%; }
         }
     </style>
 </head>
@@ -174,34 +191,35 @@
         <!-- STEP 1: Entrance Screen -->
         <div id="inputScreen">
             <span class="gift-icon">🎁</span>
-            <h2>You have a Christmas Surprise!</h2>
-            <p style="margin-bottom: 20px; opacity: 0.9;">Enter your name to unlock it:</p>
-            <input type="text" id="userName" placeholder="Type your name here..." autofocus>
+            <h2 id="inputTitle">You have a Surprise!</h2>
+            <p style="margin-bottom: 20px; opacity: 0.9;">Enter your name to see the magic:</p>
+            <input type="text" id="userName" placeholder="Your Name Here..." maxlength="20">
             <br>
-            <button class="open-btn" onclick="revealWish()">Open Your Gift! ✨</button>
+            <button class="open-btn" onclick="processName()">See Surprise ✨</button>
         </div>
 
-        <!-- STEP 2: The Message Screen -->
+        <!-- STEP 2: Message Screen -->
         <div id="wishScreen">
-            <div class="from-msg" style="font-weight: 600; font-size: 1.2rem;"><span id="displayName"></span> IS WISHING YOU</div>
+            <div class="from-msg" id="displaySender">SENDER NAME</div>
+            <p style="margin-top:10px;">IS WISHING YOU A</p>
             <h1>Merry Christmas <span id="year"></span></h1>
             
             <p class="blessing">
-                "May your Christmas be filled with love, joy, peace, and happiness. 
-                May your home shine bright with warmth and laughter."
+                "May your Christmas be filled with love, joy, and peace. 
+                May your home shine bright with laughter and your heart with happiness!"
             </p>
 
             <div class="share-box">
-                <p style="color: var(--gold); font-weight: bold; margin-bottom: 10px;">🎁 Share the surprise with friends!</p>
+                <p style="color: var(--gold); font-weight: bold; margin-bottom: 10px;">🎁 Share this surprise with your name!</p>
                 <a href="#" class="share-btn" onclick="share('wa')">WhatsApp</a>
                 <a href="#" class="share-btn" style="background: #1877F2;" onclick="share('fb')">Facebook</a>
+                <span class="create-own" onclick="location.href=window.location.pathname">Create your own greeting</span>
             </div>
         </div>
 
-        <!-- 👇 ADSTERRA AD SLOT START 👇 -->
+        <!-- Adsterra Slot -->
         <div class="ad-bottom-slot">
-            <p style="font-size: 10px; opacity: 0.6; margin: 0;">ADVERTISEMENT</p>
-            
+            <p style="font-size: 10px; opacity: 0.6; margin-bottom: 5px;">ADVERTISEMENT</p>
             <script type="text/javascript">
                 atOptions = {
                     'key' : '27817b48069ff9cb039d72c587c174f4',
@@ -213,51 +231,65 @@
             </script>
             <script type="text/javascript" src="https://www.highperformanceformat.com/27817b48069ff9cb039d72c587c174f4/invoke.js"></script>
         </div>
-        <!-- 👆 ADSTERRA AD SLOT END 👆 -->
 
     </div>
 
     <script>
-        // Set Year
-        document.getElementById('year').textContent = new Date().getFullYear();
+        const yearSpan = document.getElementById('year');
+        yearSpan.textContent = new Date().getFullYear();
 
-        // Check for shared name
+        // 1. Check if the URL has a name (?n=Name)
         const params = new URLSearchParams(window.location.search);
-        if (params.get('n')) {
-            showWish(decodeURIComponent(params.get('n')));
+        const nameFromUrl = params.get('n');
+
+        // If name exists in URL, change the title to let the user know who sent it
+        if (nameFromUrl) {
+            document.getElementById('inputTitle').textContent = decodeURIComponent(nameFromUrl) + " sent you a gift!";
         }
 
-        function revealWish() {
-            const name = document.getElementById('userName').value.trim();
-            if (name === "") { alert("Please enter your name first!"); return; }
-            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
-            setTimeout(() => { showWish(name); }, 500);
+        function processName() {
+            const nameInput = document.getElementById('userName').value.trim();
+            if (nameInput === "") {
+                alert("Please enter your name to unlock the surprise!");
+                return;
+            }
+            // Show the wish screen with the name the user just typed
+            showWish(nameInput);
         }
 
         function showWish(name) {
             document.getElementById('inputScreen').style.display = 'none';
             document.getElementById('wishScreen').style.display = 'block';
-            document.getElementById('displayName').textContent = name.toUpperCase();
+            document.getElementById('displaySender').textContent = name.toUpperCase();
             
-            // Continuous Confetti
-            const end = Date.now() + 3000;
+            // Initial burst
+            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+
+            // Continuous Snow/Confetti effect
+            const end = Date.now() + 5000;
             (function frame() {
-                confetti({ particleCount: 2, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#ffd700', '#ff0000'] });
-                confetti({ particleCount: 2, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#ffd700', '#165b33'] });
+                confetti({ particleCount: 2, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#ffd700', '#ffffff'] });
+                confetti({ particleCount: 2, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#ff0000', '#165b33'] });
                 if (Date.now() < end) requestAnimationFrame(frame);
             }());
         }
 
         function share(platform) {
-            const name = document.getElementById('displayName').textContent || "Someone";
-            const currentUrl = window.location.href.split('?')[0];
-            const personalizedUrl = `${currentUrl}?n=${encodeURIComponent(name)}`;
-            const text = `🎄 *Merry Christmas!* 🎄\n${name} has sent you a special surprise. \n\nOpen it here: \n${personalizedUrl}`;
-            if (platform === 'wa') window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`);
-            else window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(personalizedUrl)}`);
+            const name = document.getElementById('displaySender').textContent;
+            // Get the current URL without the query string
+            const baseUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+            const personalizedUrl = baseUrl + "?n=" + encodeURIComponent(name);
+            
+            const text = `🎄 *Merry Christmas!* 🎄\n\n*${name}* has sent you a special surprise gift. 🎁✨\n\nOpen it here to see: \n👇👇👇\n${personalizedUrl}`;
+
+            if (platform === 'wa') {
+                window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`);
+            } else {
+                window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(personalizedUrl)}`);
+            }
         }
 
-        // --- Snowfall ---
+        // --- Basic Snowfall Animation ---
         const canvas = document.getElementById('snow-canvas');
         const ctx = canvas.getContext('2d');
         let p = [];
