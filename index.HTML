@@ -20,10 +20,21 @@
             font-family: 'Poppins', sans-serif;
             background: radial-gradient(circle, var(--red), var(--dark-red));
             color: white;
-            overflow: hidden;
+            /* Allow scrolling so the ad can be seen at the bottom */
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
+        /* Wrapper to structure content and ads */
+        .main-container {
+            position: relative;
+            z-index: 2;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
         }
 
         /* --- Snowfall Background --- */
@@ -34,7 +45,8 @@
 
         /* --- Input Screen (The Gift) --- */
         #inputScreen {
-            z-index: 10;
+            margin-top: auto;
+            margin-bottom: auto;
             text-align: center;
             background: rgba(0,0,0,0.6);
             padding: 40px;
@@ -42,7 +54,8 @@
             border: 3px solid var(--gold);
             backdrop-filter: blur(10px);
             box-shadow: 0 0 50px rgba(0,0,0,0.5);
-            transition: 1s;
+            max-width: 400px;
+            width: 90%;
         }
 
         .gift-icon {
@@ -60,8 +73,7 @@
 
         input {
             padding: 15px;
-            width: 100%;
-            max-width: 250px;
+            width: 80%;
             border-radius: 50px;
             border: none;
             font-size: 1.1rem;
@@ -83,15 +95,14 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
 
-        .open-btn:hover { transform: scale(1.1); background: #fff; }
-
-        /* --- Message Screen (Hidden Initially) --- */
+        /* --- Message Screen --- */
         #wishScreen {
             display: none;
-            z-index: 10;
             text-align: center;
             padding: 20px;
             max-width: 600px;
+            margin-top: auto;
+            margin-bottom: auto;
             animation: zoomIn 1s ease-out;
         }
 
@@ -103,21 +114,12 @@
             margin: 10px 0;
         }
 
-        .from-msg {
-            font-size: 1.5rem;
-            letter-spacing: 2px;
-            font-weight: 600;
-            color: #fff;
-        }
-
         .blessing {
             font-family: 'Great Vibes', cursive;
             font-size: 1.8rem;
             margin: 20px 0;
-            line-height: 1.4;
         }
 
-        /* --- Reward/Share Section --- */
         .share-box {
             background: rgba(255, 255, 255, 0.1);
             padding: 20px;
@@ -136,11 +138,20 @@
             align-items: center;
             gap: 10px;
             font-weight: bold;
-            margin-top: 10px;
-            transition: 0.3s;
+            margin: 5px;
         }
 
-        .share-btn.fb { background: #1877F2; }
+        /* --- Adsterra Bottom Slot --- */
+        .ad-bottom-slot {
+            margin-top: 40px;
+            padding-bottom: 20px;
+            text-align: center;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
 
         @keyframes zoomIn {
             from { opacity: 0; transform: scale(0.5); }
@@ -150,6 +161,7 @@
         @media (max-width: 500px) {
             h1 { font-size: 2.5rem; }
             .blessing { font-size: 1.4rem; }
+            .ad-bottom-slot { overflow-x: auto; } /* Handle wider ad on tiny screens */
         }
     </style>
 </head>
@@ -157,64 +169,68 @@
 
     <canvas id="snow-canvas"></canvas>
 
-    <!-- STEP 1: Entrance Screen -->
-    <div id="inputScreen">
-        <span class="gift-icon">🎁</span>
-        <h2>You have a Christmas Surprise!</h2>
-        <p style="margin-bottom: 20px; opacity: 0.9;">Enter your name to unlock it:</p>
-        <input type="text" id="userName" placeholder="Type your name here..." autofocus>
-        <br>
-        <button class="open-btn" onclick="revealWish()">Open Your Gift! ✨</button>
-    </div>
-
-    <!-- STEP 2: The Reward & Sharing Screen -->
-    <div id="wishScreen">
-        <div class="from-msg"><span id="displayName"></span> IS WISHING YOU</div>
-        <h1>Merry Christmas <span id="year"></span></h1>
+    <div class="main-container">
         
-        <p class="blessing">
-            "May your Christmas be filled with love, joy, peace, and happiness. 
-            May your home shine bright with warmth and laughter.
-            Wishing you a blessed and joyful Merry Christmas!"
-        </p>
-
-        <div class="share-box">
-            <p style="color: var(--gold); font-weight: bold; margin-bottom: 10px;">🎁 REWARD UNLOCKED: Share the joy!</p>
-            <a href="#" class="share-btn" id="waBtn" onclick="share('wa')">Share on WhatsApp</a>
-            <a href="#" class="share-btn fb" id="fbBtn" onclick="share('fb')">Facebook</a>
+        <!-- STEP 1: Entrance Screen -->
+        <div id="inputScreen">
+            <span class="gift-icon">🎁</span>
+            <h2>You have a Christmas Surprise!</h2>
+            <p style="margin-bottom: 20px; opacity: 0.9;">Enter your name to unlock it:</p>
+            <input type="text" id="userName" placeholder="Type your name here..." autofocus>
+            <br>
+            <button class="open-btn" onclick="revealWish()">Open Your Gift! ✨</button>
         </div>
-        
-        <p style="margin-top: 30px; font-size: 0.8rem; opacity: 0.6;">Click the buttons above to send this personalized gift to others!</p>
+
+        <!-- STEP 2: The Message Screen -->
+        <div id="wishScreen">
+            <div class="from-msg" style="font-weight: 600; font-size: 1.2rem;"><span id="displayName"></span> IS WISHING YOU</div>
+            <h1>Merry Christmas <span id="year"></span></h1>
+            
+            <p class="blessing">
+                "May your Christmas be filled with love, joy, peace, and happiness. 
+                May your home shine bright with warmth and laughter."
+            </p>
+
+            <div class="share-box">
+                <p style="color: var(--gold); font-weight: bold; margin-bottom: 10px;">🎁 Share the surprise with friends!</p>
+                <a href="#" class="share-btn" onclick="share('wa')">WhatsApp</a>
+                <a href="#" class="share-btn" style="background: #1877F2;" onclick="share('fb')">Facebook</a>
+            </div>
+        </div>
+
+        <!-- 👇 ADSTERRA AD SLOT START 👇 -->
+        <div class="ad-bottom-slot">
+            <p style="font-size: 10px; opacity: 0.6; margin: 0;">ADVERTISEMENT</p>
+            
+            <script type="text/javascript">
+                atOptions = {
+                    'key' : '27817b48069ff9cb039d72c587c174f4',
+                    'format' : 'iframe',
+                    'height' : 60,
+                    'width' : 468,
+                    'params' : {}
+                };
+            </script>
+            <script type="text/javascript" src="https://www.highperformanceformat.com/27817b48069ff9cb039d72c587c174f4/invoke.js"></script>
+        </div>
+        <!-- 👆 ADSTERRA AD SLOT END 👆 -->
+
     </div>
 
     <script>
-        const year = new Date().getFullYear();
-        document.getElementById('year').textContent = year;
+        // Set Year
+        document.getElementById('year').textContent = new Date().getFullYear();
 
-        // Check if URL already has a name (when shared)
+        // Check for shared name
         const params = new URLSearchParams(window.location.search);
-        const sharedName = params.get('n');
-
-        if (sharedName) {
-            // If someone opened a shared link, skip to the wish screen directly
-            showWish(decodeURIComponent(sharedName));
+        if (params.get('n')) {
+            showWish(decodeURIComponent(params.get('n')));
         }
 
         function revealWish() {
             const name = document.getElementById('userName').value.trim();
-            if (name === "") {
-                alert("Please enter your name first!");
-                return;
-            }
-            
-            // The Reward Effect (Confetti)
-            confetti({
-                particleCount: 150,
-                spread: 70,
-                origin: { y: 0.6 },
-                colors: ['#ffd700', '#ffffff', '#ff0000', '#00ff00']
-            });
-
+            if (name === "") { alert("Please enter your name first!"); return; }
+            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
             setTimeout(() => { showWish(name); }, 500);
         }
 
@@ -223,14 +239,12 @@
             document.getElementById('wishScreen').style.display = 'block';
             document.getElementById('displayName').textContent = name.toUpperCase();
             
-            // Trigger more confetti for the "Reward" feel
-            const duration = 3 * 1000;
-            const end = Date.now() + duration;
-
+            // Continuous Confetti
+            const end = Date.now() + 3000;
             (function frame() {
                 confetti({ particleCount: 2, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#ffd700', '#ff0000'] });
                 confetti({ particleCount: 2, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#ffd700', '#165b33'] });
-                if (Date.now() < end) { requestAnimationFrame(frame); }
+                if (Date.now() < end) requestAnimationFrame(frame);
             }());
         }
 
@@ -238,63 +252,25 @@
             const name = document.getElementById('displayName').textContent || "Someone";
             const currentUrl = window.location.href.split('?')[0];
             const personalizedUrl = `${currentUrl}?n=${encodeURIComponent(name)}`;
-            const text = `🎄 *Merry Christmas!* 🎄\n${name} has sent you a special Christmas gift surprise. \n\nClick here to open it: \n${personalizedUrl}`;
-
-            if (platform === 'wa') {
-                window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
-            } else {
-                window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(personalizedUrl)}`, '_blank');
-            }
+            const text = `🎄 *Merry Christmas!* 🎄\n${name} has sent you a special surprise. \n\nOpen it here: \n${personalizedUrl}`;
+            if (platform === 'wa') window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`);
+            else window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(personalizedUrl)}`);
         }
 
-        // --- Simple Snowfall ---
+        // --- Snowfall ---
         const canvas = document.getElementById('snow-canvas');
         const ctx = canvas.getContext('2d');
-        let particles = [];
+        let p = [];
         function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-        window.addEventListener('resize', resize);
-        resize();
-
-        function initSnow() {
-            for (let i = 0; i < 100; i++) {
-                particles.push({ x: Math.random() * canvas.width, y: Math.random() * canvas.height, r: Math.random() * 3 + 1, v: Math.random() * 2 + 0.5 });
-            }
-        }
-        function drawSnow() {
+        window.onresize = resize; resize();
+        for(let i=0; i<100; i++) p.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, r:Math.random()*3+1, v:Math.random()*2+0.5});
+        function draw() {
             ctx.clearRect(0,0,canvas.width, canvas.height);
-            ctx.fillStyle = "white";
-            ctx.beginPath();
-            for (let p of particles) {
-                ctx.moveTo(p.x, p.y);
-                ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
-                p.y += p.v;
-                if (p.y > canvas.height) p.y = -10;
-            }
-            ctx.fill();
-            requestAnimationFrame(drawSnow);
+            ctx.fillStyle = "white"; ctx.beginPath();
+            p.forEach(s => { ctx.moveTo(s.x, s.y); ctx.arc(s.x, s.y, s.r, 0, Math.PI*2); s.y+=s.v; if(s.y>canvas.height) s.y=-10; });
+            ctx.fill(); requestAnimationFrame(draw);
         }
-        initSnow();
-        drawSnow();
+        draw();
     </script>
 </body>
 </html>
-<script>
-  atOptions = {
-    'key' : '27817b48069ff9cb039d72c587c174f4',
-    'format' : 'iframe',
-    'height' : 60,
-    'width' : 468,
-    'params' : {}
-  };
-</script>
-<script src="https://www.highperformanceformat.com/27817b48069ff9cb039d72c587c174f4/invoke.js"></script>
-<script>
-  atOptions = {
-    'key' : '27817b48069ff9cb039d72c587c174f4',
-    'format' : 'iframe',
-    'height' : 60,
-    'width' : 468,
-    'params' : {}
-  };
-</script>
-<script src="https://www.highperformanceformat.com/27817b48069ff9cb039d72c587c174f4/invoke.js"></script>
